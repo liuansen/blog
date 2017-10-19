@@ -2,13 +2,28 @@ import markdown
 
 from markdown.extensions.toc import TocExtension
 
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.utils.text import slugify
-from django.db.models import Q
 
 from comments.forms import CommentForm
 from .models import Post, CateGory, Tag
+
+"""
+请使用下方的模板引擎方式。
+def index(request):
+    return HttpResponse("欢迎访问我的博客首页！")
+"""
+
+"""
+请使用下方真正的首页视图函数
+def index(request):
+    return render(request, 'blog/index.html', context={
+        'title': '我的博客首页',
+        'welcome': '欢迎访问我的博客首页'
+    })
+"""
 
 
 def index(request):
@@ -154,6 +169,20 @@ class IndexView(ListView):
         return data
 
 
+"""
+请使用下方包含评论列表和评论表单的详情页视图
+def detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.body = markdown.markdown(post.body,
+                                  extensions=[
+                                      'markdown.extensions.extra',
+                                      'markdown.extensions.codehilite',
+                                      'markdown.extensions.toc',
+                                  ])
+    return render(request, 'blog/detail.html', context={'post': post})
+"""
+
+
 def detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
@@ -282,4 +311,3 @@ def search(request):
     post_list = Post.objects.filter(Q(title__icontains=q) | Q(body__icontains=q))
     return render(request, 'blog/index.html', {'error_msg': error_msg,
                                                'post_list': post_list})
-
